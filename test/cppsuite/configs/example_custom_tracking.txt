@@ -1,0 +1,84 @@
+duration_seconds=5,
+# The configuration can produce a large number of updates at once, therefore use 500MB cache size 
+# to hold these values.
+cache_size_mb=500,
+compression_enabled=true,
+statistics_config=
+(
+    type=all,
+    enable_logging=true
+),
+checkpoint_manager=
+(
+    enabled=true,
+    op_rate=60s
+),
+runtime_monitor=
+(
+    # Seems to insert around 477K records. Give it +-20K margin.
+    cache_hs_insert=
+    (
+        max=497000,
+        min=457000,
+        postrun=false,
+        save=true,
+    ),
+    # Seems to remove 160K records. Give it a similar margin.
+    cc_pages_removed=
+    (
+        max=170000,
+        min=150000,
+        postrun=false,
+        save=true,
+    ),
+    stat_cache_size=
+    (
+        max=110,
+        runtime=true,
+    ),
+    # The data files compress to around 25MB per table at the end of a run so 250MB total.
+    # +1.4GB for the history store. With an additional 150MB margin.
+    stat_db_size=
+    (
+        max=1900000000,
+        save=true,
+    ),
+),
+timestamp_manager=
+(
+    enabled=true,
+    oldest_lag=2,
+    stable_lag=5
+),
+workload_generator=
+(
+    populate_config=
+    (
+        collection_count=1,
+        key_count_per_collection=100,
+        key_size=5,
+        thread_count=1,
+        value_size=1000
+    ),
+    read_config=
+    (
+        op_rate=5ms,
+        ops_per_transaction=(max=100,min=1),
+        thread_count=0
+    ),
+    update_config=
+    (
+        op_rate=10ms,
+        ops_per_transaction=(max=20,min=0),
+        thread_count=1,
+        value_size=100000
+    )
+),
+workload_tracking=
+(
+    enabled=true,
+    is_custom=true,
+    tracking_key_format=q,
+    tracking_value_format=q,
+    op_rate=3s
+)
